@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Woman's Story: Peace Through the Archives</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .story-panel {
+            padding: 0; /* Remove padding that pushes content down */
+            overflow-y: auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: block; /* Change from flex to block */
+            position: relative;
+        }
+
+        .viewer-panel {
+            background: #000;
+            position: relative;
+        }
+
+        #viewer {
+            width: 100%;
+            height: 100%;
+        }
+
+        .scrolly-content {
+            height: 500vh;
+            position: relative;
+            z-index: 10;
+             /* Ensure content starts at the very top of its container */
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        .step {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 2rem;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+            border: 3px solid transparent;
+        }
+
+        /* Debug borders for troubleshooting - only show in debug mode */
+        .debug-mode .step[data-step="1"] { border-color: red; }
+        .debug-mode .step[data-step="2"] { border-color: blue; }
+        .debug-mode .step[data-step="3"] { border-color: green; }
+        .debug-mode .step[data-step="4"] { border-color: orange; }
+        .debug-mode .step[data-step="5"] { border-color: purple; }
+
+        /* Debug indicator */
+        .debug-indicator {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 3px;
+            z-index: 1000;
+            font-family: monospace;
+        }
+
+        .step.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .step-content {
+            max-width: 500px;
+        }
+
+        .step h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
+
+        .step p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .highlight-box {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .reveal {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            text-align: center;
+        }
+
+        .reveal h2 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .tech-details {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .fade-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .fade-overlay.active {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 1fr;
+            }
+            
+            .step h2 {
+                font-size: 2rem;
+            }
+            
+            .step p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="story-panel">
+            <div class="scrolly-content">
+                <div class="step" data-step="1">
+                    <div class="step-content">
+                        <h2>Meet Eleanor</h2>
+                        <p>In 1915, a remarkable woman signed a petition that would echo through history. Her name appears in the International Women's Peace Petition, alongside thousands of others who dared to imagine a world without war.</p>
+                        <p>But Eleanor's story doesn't end there. Her life weaves through our archives like a golden thread, connecting moments of courage, creativity, and conviction.</p>
+                    </div>
+                </div>
+
+                <div class="step" data-step="2">
+                    <div class="step-content">
+                        <h2>The Peace Petition</h2>
+                        <p>Here, in faded ink on weathered paper, we find Eleanor's signature among the brave women who stood against the Great War. Each name represents a story, a hope, a declaration of peace.</p>
+                        <div class="highlight-box">
+                            <p><strong>1915:</strong> Over 1,000 women from across Britain signed this petition, demanding their voices be heard in matters of war and peace.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step" data-step="3">
+                    <div class="step-content">
+                        <h2>A Life Revealed</h2>
+                        <p>Following Eleanor's trail through our collections reveals a woman of many talents. Here she appears in a society portrait from 1912 - young, determined, already showing signs of the activist she would become.</p>
+                        <p>Notice the subtle details: her pose, her expression, the way she holds herself. This is someone ready to change the world.</p>
+                    </div>
+                </div>
+
+                <div class="step" data-step="4">
+                    <div class="step-content">
+                        <h2>Letters of Purpose</h2>
+                        <p>In her correspondence from 1920, we see Eleanor's continued commitment to social justice. Her handwriting, forceful and clear, speaks of certainty and purpose.</p>
+                        <p>She writes: "The work of peace is not finished with the war's end, but has only just begun."</p>
+                    </div>
+                </div>
+
+                <div class="step reveal" data-step="5">
+                    <div class="step-content">
+                        <h2>The Magic Behind the Story</h2>
+                        <p>Every image you've seen, every zoom, every seamless transition between documents - all powered by <strong>IIIF</strong>.</p>
+                        <div class="tech-details">
+                            <p><strong>International Image Interoperability Framework</strong></p>
+                            <p>✨ High-resolution images from multiple collections</p>
+                            <p>✨ Deep zoom capabilities revealing hidden details</p>
+                            <p>✨ Standardized access across institutions worldwide</p>
+                            <p>✨ Seamless integration for storytelling like this</p>
+                        </div>
+                        <p style="margin-top: 2rem; font-size: 1.4rem;">IIIF doesn't just store our heritage - it brings it to life.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="viewer-panel">
+            <div id="viewer"></div>
+            <div class="fade-overlay" id="fadeOverlay"></div>
+        </div>
+    </div>
+
+    <script>
+        // Check for debug mode via URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const debugMode = urlParams.get('debug') === 'true';
+        
+        // Debug logging function
+        function debugLog(...args) {
+            if (debugMode) {
+                console.log(...args);
+            }
+        }
+
+        // Story configuration with IIIF canvas JSON files
+        const storyData = {
+            sections: [
+                {
+                    id: 1,
+                    canvasJson: "https://damsssl.llgc.org.uk/iiif/2.0/4627942/canvas/4627945.json",
+                    initialView: { zoom: 1, x: 0.5, y: 0.5 },
+                    description: "Opening view of Eleanor's world"
+                },
+                {
+                    id: 2,
+                    canvasJson: "https://damsssl.llgc.org.uk/iiif/2.0/4627942/canvas/4628269.json",
+                    initialView: { zoom: 1.2, x: 0.6, y: 0.4 },
+                    animation: { zoom: 1, x: 0.5, y: 0.5 },
+                    description: "The Women's Peace Petition with signature highlighted"
+                },
+                {
+                    id: 3,
+                    canvasJson: "https://damsssl.llgc.org.uk/iiif/2.0/4627942/canvas/4628269.json",
+                    initialView: { zoom: 1, x: 0.5, y: 0.5 },
+                    animation: { zoom: 2.5, x: 0.4, y: 0.6, duration: 1000 },
+                    description: "Eleanor's portrait from our photographic collection"
+                },
+                {
+                    id: 4,
+                    canvasJson: "https://damsssl.llgc.org.uk/iiif/2.0/4627942/canvas/4628015.json",
+                    initialView: { zoom: 1, x: 0.5, y: 0.5 },
+                    animation: { zoom: 2, x: 0.3, y: 0.7, duration: 2500 },
+                    description: "Eleanor's correspondence revealing her continued activism"
+                },
+                {
+                    id: 5,
+                    canvasJson: null, // No specific canvas for reveal
+                    specialEffect: "fade",
+                    description: "The IIIF reveal moment"
+                }
+            ]
+        };
+
+        let viewer;
+        let currentSection = 0;
+
+        // Initialize OpenSeadragon viewer
+        function initViewer() {
+            viewer = OpenSeadragon({
+                id: "viewer",
+                prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
+                showNavigationControl: false,
+                showZoomControl: false,
+                showHomeControl: false,
+                showFullPageControl: false,
+                gestureSettingsMouse: {
+                    clickToZoom: false,
+                    dblClickToZoom: false,
+                    pinchToZoom: false,
+                    flickEnabled: false,
+                    pinchRotate: false
+                },
+                zoomPerScroll: 1,
+                animationTime: 1.5,
+                springStiffness: 15.0
+            });
+
+            // Load first section
+            loadSection(storyData.sections[0]);
+        }
+
+        // Load a story section using canvas JSON approach
+        function loadSection(section) {
+            if (!section.canvasJson && section.specialEffect === "fade") {
+                document.getElementById('fadeOverlay').classList.add('active');
+                return;
+            }
+
+            document.getElementById('fadeOverlay').classList.remove('active');
+
+            // Fetch canvas JSON directly
+            fetch(section.canvasJson)
+                .then(res => res.json())
+                .then(canvas => {
+                    debugLog('Canvas loaded:', canvas);
+                    
+                    // Extract image service from canvas
+                    let imageService;
+                    let tileSource;
+
+                    if (canvas.images && canvas.images[0] && canvas.images[0].resource) {
+                        // IIIF 2.x canvas format
+                        const resource = canvas.images[0].resource;
+                        
+                        if (resource.service) {
+                            imageService = resource.service;
+                        } else if (resource['@id']) {
+                            // Sometimes the image itself contains the service URL
+                            const imageId = resource['@id'];
+                            imageService = { '@id': imageId.replace(/\/full\/.*$/, '') };
+                        }
+                    }
+
+                    if (imageService && imageService['@id']) {
+                        // Create proper IIIF tile source
+                        tileSource = {
+                            "@context": "http://iiif.io/api/image/2/context.json",
+                            "@id": imageService["@id"],
+                            "width": canvas.width,
+                            "height": canvas.height,
+                            "profile": imageService.profile || ["http://iiif.io/api/image/2/level1.json"],
+                            "protocol": "http://iiif.io/api/image"
+                        };
+                    } else {
+                        // Fallback: construct info.json URL from canvas JSON URL
+                        const baseUrl = section.canvasJson.replace(/\/canvas\/.*\.json$/, '');
+                        tileSource = baseUrl + '/info.json';
+                    }
+
+                    debugLog('Tile source:', tileSource);
+
+                    // Clear existing handlers
+                    viewer.removeAllHandlers('open');
+                    viewer.clearOverlays();
+
+                    // Set up new handler for this section
+                    viewer.addHandler("open", function() {
+                        setTimeout(() => {
+                            // Set initial view
+                            const view = section.initialView;
+                            if (view && viewer.viewport) {
+                                viewer.viewport.fitBounds(
+                                    new OpenSeadragon.Rect(
+                                        view.x - 0.5/view.zoom, 
+                                        view.y - 0.5/view.zoom, 
+                                        1/view.zoom, 
+                                        1/view.zoom
+                                    ),
+                                    false
+                                );
+
+                                // Apply animation if specified
+                                if (section.animation) {
+                                    setTimeout(() => {
+                                        const anim = section.animation;
+                                        const bounds = new OpenSeadragon.Rect(
+                                            anim.x - 0.5/anim.zoom,
+                                            anim.y - 0.5/anim.zoom,
+                                            1/anim.zoom,
+                                            1/anim.zoom
+                                        );
+                                        viewer.viewport.fitBounds(bounds, true);
+                                    }, 500);
+                                }
+                            }
+                        }, 100);
+                    });
+
+                    // Open the tile source
+                    viewer.open(tileSource);
+                })
+                .catch(error => {
+                    debugLog('Error loading IIIF canvas:', error);
+                    debugLog('Attempting direct info.json fallback...');
+                    
+                    // Final fallback: try to construct info.json URL
+                    const baseUrl = section.canvasJson.replace(/\/canvas\/.*\.json$/, '');
+                    const infoUrl = baseUrl + '/info.json';
+                    debugLog('Trying fallback URL:', infoUrl);
+                    viewer.open(infoUrl);
+                });
+        }
+
+        // Scroll detection using Intersection Observer
+        function setupScrollTriggers() {
+            const steps = document.querySelectorAll('.step');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    debugLog('Step observed:', entry.target.dataset.step, 'isIntersecting:', entry.isIntersecting, 'intersectionRatio:', entry.intersectionRatio);
+                    
+                    if (entry.isIntersecting) {
+                        debugLog('Step activated:', entry.target.dataset.step);
+                        
+                        // Remove active class from all steps
+                        steps.forEach(step => step.classList.remove('active'));
+                        
+                        // Add active class to current step
+                        entry.target.classList.add('active');
+                        
+                        // Get step number and load corresponding section
+                        const stepNum = parseInt(entry.target.dataset.step);
+                        if (stepNum !== currentSection && stepNum <= storyData.sections.length) {
+                            debugLog('Loading section:', stepNum);
+                            currentSection = stepNum;
+                            loadSection(storyData.sections[stepNum - 1]);
+                        }
+                    }
+                });
+            }, {
+                threshold: 0.6,
+                rootMargin: '-20% 0px -20% 0px'
+            });
+
+            steps.forEach(step => observer.observe(step));
+        }
+
+        // Debug function to check step positions
+        function debugStepPositions() {
+            if (!debugMode) return;
+            
+            const steps = document.querySelectorAll('.step');
+            debugLog('=== Step Position Debug ===');
+            steps.forEach(step => {
+                const rect = step.getBoundingClientRect();
+                debugLog(`Step ${step.dataset.step}:`, {
+                    top: rect.top,
+                    bottom: rect.bottom,
+                    visible: rect.top < window.innerHeight && rect.bottom > 0,
+                    fullyVisible: rect.top >= 0 && rect.bottom <= window.innerHeight
+                });
+            });
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Enable debug mode styling if active
+            if (debugMode) {
+                document.body.classList.add('debug-mode');
+                
+                // Add debug indicator
+                const debugIndicator = document.createElement('div');
+                debugIndicator.className = 'debug-indicator';
+                debugIndicator.textContent = 'DEBUG MODE';
+                document.body.appendChild(debugIndicator);
+                
+                // Add debug button
+                const debugButton = document.createElement('button');
+                debugButton.textContent = 'Debug Steps';
+                debugButton.style.position = 'fixed';
+                debugButton.style.top = '10px';
+                debugButton.style.right = '10px';
+                debugButton.style.zIndex = '1000';
+                debugButton.style.background = 'red';
+                debugButton.style.color = 'white';
+                debugButton.style.padding = '10px';
+                debugButton.style.border = 'none';
+                debugButton.style.borderRadius = '3px';
+                debugButton.style.cursor = 'pointer';
+                debugButton.onclick = debugStepPositions;
+                document.body.appendChild(debugButton);
+            }
+            
+            debugLog('=== Page Load Debug ===');
+            debugLog('Initial scroll position:', window.scrollY);
+            debugLog('Window height:', window.innerHeight);
+            debugLog('Document height:', document.body.scrollHeight);
+            
+            // Force scroll to top
+            debugLog('Forcing scroll to top...');
+            window.scrollTo(0, 0);
+            
+            // Check scroll position after forced scroll
+            setTimeout(() => {
+                debugLog('Scroll position after force:', window.scrollY);
+                debugStepPositions();
+            }, 100);
+            
+            initViewer();
+            setupScrollTriggers();
+        });
+    </script>
+</body>
+</html>
