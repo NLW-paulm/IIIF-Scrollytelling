@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Woman's Story: Peace Through the Archives</title>
+    <title>The National Library of Wales - Crowdsourcing</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
     <style>
         * {
@@ -48,6 +48,43 @@
             height: 100%;
         }
 
+        /* Enhanced Navigation Controls */
+        .nav-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .scrolly-content {
             height: 500vh;
             position: relative;
@@ -75,19 +112,7 @@
         .debug-mode .step[data-step="4"] { border-color: orange; }
         .debug-mode .step[data-step="5"] { border-color: purple; }
 
-        /* Debug indicator */
-        .debug-indicator {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            background: rgba(255, 0, 0, 0.8);
-            color: white;
-            padding: 5px 10px;
-            font-size: 12px;
-            border-radius: 3px;
-            z-index: 1000;
-            font-family: monospace;
-        }
+
 
         .step.active {
             opacity: 1;
@@ -95,17 +120,17 @@
         }
 
         .step-content {
-            max-width: 500px;
+            max-width: 800px;
         }
 
         .step h2 {
-            font-size: 2.5rem;
+            font-size: 3.2rem;
             margin-bottom: 1rem;
             font-weight: 300;
         }
 
         .step p {
-            font-size: 1.2rem;
+            font-size: 1.7rem;
             line-height: 1.8;
             margin-bottom: 1rem;
         }
@@ -117,6 +142,12 @@
             padding: 1.5rem;
             margin-top: 1rem;
             backdrop-filter: blur(10px);
+        }
+
+        .highlight-box  {
+            font-size: 1.4rem;
+            color: #e2e8f0;
+            margin: 0;
         }
 
         .reveal {
@@ -153,7 +184,76 @@
             opacity: 1;
         }
 
-        @media (max-width: 768px) {
+        @keyframes fadeInScale {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .annotation-overlay {
+            font-family: Arial, sans-serif;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            z-index: 100;
+        }
+
+        .annotation-overlay:hover {
+            transform: scale(1.1);
+            z-index: 1000;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+        }
+
+        .annotation-overlay.color-1 {
+            background: rgba(255, 100, 100, 0.65);
+            border: 2px solid #ff6464;
+        }
+
+        .annotation-overlay.color-2 {
+            background: rgba(100, 150, 255, 0.45);
+            border: 2px solid #6496ff;
+        }
+
+        .annotation-overlay.color-3 {
+            background: rgba(100, 255, 150, 0.45);
+            border: 2px solid #64ff96;
+        }
+
+        .annotation-overlay.color-4 {
+            background: rgba(255, 200, 100, 0.45);
+            border: 2px solid #ffc864;
+        }
+
+        .annotation-overlay.color-5 {
+            background: rgba(200, 100, 255, 0.45);
+            border: 2px solid #c864ff;
+        }
+
+        .annotation-overlay.color-6 {
+            background: rgba(255, 150, 200, 0.45);
+            border: 2px solid #ff96c8;
+        }
+
+        .debug-indicator {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 3px;
+            z-index: 1000;
+            font-family: monospace;
+        }
+
+@media (max-width: 768px) {
             .container {
                 grid-template-columns: 1fr;
                 grid-template-rows: 1fr 1fr;
@@ -166,69 +266,166 @@
             .step p {
                 font-size: 1rem;
             }
+
+            .nav-controls {
+                bottom: 10px;
+                right: 10px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Enhanced Navigation Controls -->
+    <div class="nav-controls">
+        <button class="nav-btn" id="prevBtn" onclick="navigateStep(-1)" aria-label="Previous section">‹</button>
+        <button class="nav-btn" id="nextBtn" onclick="navigateStep(1)" aria-label="Next section">›</button>
+    </div>
+
     <div class="container">
         <div class="story-panel">
             <div class="scrolly-content">
-                <div class="step" data-step="1">
-                    <div class="step-content">
-                        <h2>Meet Eleanor</h2>
-                        <p>In 1915, a remarkable woman signed a petition that would echo through history. Her name appears in the International Women's Peace Petition, alongside thousands of others who dared to imagine a world without war.</p>
-                        <p>But Eleanor's story doesn't end there. Her life weaves through our archives like a golden thread, connecting moments of courage, creativity, and conviction.</p>
-                    </div>
+            <div class="step" data-step="1">
+                <div class="step-content">
+                    <img src="https://www.library.wales/fileadmin/_processed_/a/1/csm_NLW_Primary_Logo_RGB_2b47fb94ef.png"
+                        alt="NLW Logo" style="max-width: 500px; margin-bottom: 1em;" />
+                    <h2>Crowdsourcing at <br />The National Library of Wales</h2>
+                    <p><strong>Paul McCann</strong><br />Head of Digital Scholarship</p>
+                    <p>IIIF Conference 2025 - Leeds<br /> A story of connections</p>
                 </div>
-
-                <div class="step" data-step="2">
-                    <div class="step-content">
-                        <h2>The Peace Petition</h2>
-                        <p>Here, in faded ink on weathered paper, we find Eleanor's signature among the brave women who stood against the Great War. Each name represents a story, a hope, a declaration of peace.</p>
-                        <div class="highlight-box">
-                            <p><strong>1915:</strong> Over 1,000 women from across Britain signed this petition, demanding their voices be heard in matters of war and peace.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step" data-step="3">
-                    <div class="step-content">
-                        <h2>A Life Revealed</h2>
-                        <p>Following Eleanor's trail through our collections reveals a woman of many talents. Here she appears in a society portrait from 1912 - young, determined, already showing signs of the activist she would become.</p>
-                        <p>Notice the subtle details: her pose, her expression, the way she holds herself. This is someone ready to change the world.</p>
-                    </div>
-                </div>
-
-                <div class="step" data-step="4">
-                    <div class="step-content">
-                        <h2>Letters of Purpose</h2>
-                        <p>In her correspondence from 1920, we see Eleanor's continued commitment to social justice. Her handwriting, forceful and clear, speaks of certainty and purpose.</p>
-                        <p>She writes: "The work of peace is not finished with the war's end, but has only just begun."</p>
-                    </div>
-                </div>
-
-                <div class="step reveal" data-step="5">
-                    <div class="step-content">
-                        <h2>The Magic Behind the Story</h2>
-                        <p>Every image you've seen, every zoom, every seamless transition between documents - all powered by <strong>IIIF</strong>.</p>
-                        <div class="tech-details">
-                            <p><strong>International Image Interoperability Framework</strong></p>
-                            <p>✨ High-resolution images from multiple collections</p>
-                            <p>✨ Deep zoom capabilities revealing hidden details</p>
-                            <p>✨ Standardized access across institutions worldwide</p>
-                            <p>✨ Seamless integration for storytelling like this</p>
-                        </div>
-                        <p style="margin-top: 2rem; font-size: 1.4rem;">IIIF doesn't just store our heritage - it brings it to life.</p>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-content">
+                        <h2>Early Crowdsourcing at NLW</h2>
+                        <p>Crowdsourcing at NLW for over 14 years,<br /> Volunteers contribute both online and in person
+                    <br />IIIF powered Bilingual Crowdsourcing platform</p>
+                    <div class="highlight-box">
+                        <p>
+                        <ul>
+                            <li>Early forerunner Project: WWI Book of Remembrance </li>
+                            <li>40,000+ names transcribed by over schools & communities </li>
+                            <li>Over 100 Volunteers transcribed, names, ranks and regiment of all the soldiers</li>
+                            <li>Digitised, Transcribed and made publicly available in 2 years.</li>
+                        </ul>
+                        </p>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="viewer-panel">
-            <div id="viewer"></div>
-            <div class="fade-overlay" id="fadeOverlay"></div>
-        </div>
-    </div>
+        
+            <div class="step" data-step="3">
+                <div class="step-content">
+                    <h2>War Tribunals</h2>
+                    <p>
+                    <ul>
+                        <li>Transcription of the Cardiganshire War Tribunal records.</li>
+                        <li>These records captured military service appeals—often from employers.</li>
+                        <li>Over 10,000 pages were transcribed by over 200 volunteers in six months.</li>
+                    </ul>
+                    </p>
+            
+                </div>
+            </div>
+            
+            <div class="step" data-step="4">
+                <div class="step-content">
+                    <h2>Newspapers</h2>
+                    <p>
+                    <ul>
+                        <li>John appeared in our digitised newspaper archive.</li>
+                        <li>Though not crowdsourced, the OCR is good.</li>
+                        <li>I found his appeal story reported in several local papers.</li>
+                        <li>John died in France in 1917 at age 23.</li>
+                        </p>
+                </div>
+            </div>
+            
+            <div class="step" data-step="5">
+                <div class="step-content">
+                    <h2>A Life Revealed</h2>
+                    <p>
+                    <ul>
+                        <li>Fast forward to our most ambitious project yet: the Welsh Women's Peace Petition.</li>
+                        <li>Signed by nearly 400,000 women in 1923 to urge the US to join the League of Nations.</li>
+                        <li>The petition was housed in an oak chest and delivered to the US in 1924.</li>
+                        <li>For nearly a century it remained at the Smithsonian, before being gifted back to Wales in 2023.</li>
+                    </ul>
+                    </p>
+                </div>
+            </div>
+            
+            
+            <div class="step" data-step="6">
+                <div class="step-content">
+                    <h2>Tale of Two Brothers</h2>
+                    <p>
+                    <ul>
+                        <li>Back to the Book of Remembrance.</li>
+                        <li>We found Walter Llewelyn Ladd—likely John's brother.</li>
+                        <li>Same surname, hometown, and parents (Charles and Hannah).</li>
+                        <li>His address was listed as 7 Church Street, Cardigan.</li>
+                    </ul>
+                    </p>
+                </div>
+            </div>        
+            <div class="step" data-step="7">
+                <div class="step-content">
+                    <h2>Walter in the news</h2>
+                    <p>
+                    <ul>
+                        <li>Digging further, I found local newspaper stories about Walter’s youth—playfully mischievous</li>
+                        <li>A glimpse of his personality and the life he lived before tragedy struck.</li>
+                    </ul>
+                    </p>
+                </div>
+            </div>
+            <div class="step" data-step="8">
+                <div class="step-content">
+                    <h2>Martha Signs</h2>
+                    <p>
+                    <ul>
+                        <li>Now we had John, Walter, and their family.</li>
+                        <li>Though we didn’t find Martha in the Peace Petition, we did find Hannah—listed at 7 Church Street,
+                            Cardigan.</li>
+                        <li>Five years after losing both sons, Hannah signed a plea for peace.</li>
+                        <li>Her story brings John's to a poignant end—not with war, but with hope.</li>
+                    </ul>
+                    </p>
+                </div>
+            </div>
+            <div class="step" data-step="9">
+                <div class="step-content">
+                    <h2>Blanche</h2>
+                    <p>
+                    <ul>
+                        <li>This is just one story.</li>
+                        <li>Blanche Baker-Gabb lived a very different life.</li>
+                        <li>Her name appears in the Peace Petition too—but her story runs through estate papers, weather logs,
+                            Women’s Institute records.</li>
+                        <li>Blanche was well-travelled, philanthropic, a suffragist.</li>
+                    </ul>
+                    </p>
+                </div>
+            </div>
+            <div class="step" data-step="10">
+                <div class="step-content">
+                    <h2>Pulling it all together</h2>
+                    <p>
+                    <ul>
+                        <li>You might wonder what this has to do with IIIF.</li>
+                        <li>This story was made possible by IIIF and crowdsourcing.</li>
+                        <li>From BOR to tribunals, newspapers, and the Peace Petition—we followed a thread only visible through
+                            combined effort.</li>
+                        <li>Volunteers aren’t just scribes—they’re detectives.</li>
+                    </ul>
+                    </p>
+                </div>
+            </div>
+            </div>
+            </div>
+            <div class="viewer-panel">
+                <div id="viewer"></div>
+                <div class="fade-overlay" id="fadeOverlay"></div>
+            </div>
+            </div>
 
     <script>
         // Check for debug mode via URL parameter
@@ -247,34 +444,139 @@
             sections: [
                 {
                     id: 1,
-                    canvasJson: "https://damsssl.llgc.org.uk/iiif/2.0/4627942/canvas/4627945.json",
-                    initialView: { zoom: 1, x: 0.5, y: 0.5 },
-                    description: "Opening view of Eleanor's world"
+                    regularImage: "https://www.library.wales/fileadmin/images_gwefan/new_structure/homepage/NLW_Homepage_01.jpg",
+                    imagefit: "contain",
+                    description: "The National Library of Wales - Crowdsourcing",
+                    
                 },
                 {
                     id: 2,
-                    canvasJson: "https://damsssl.llgc.org.uk/iiif/2.0/4627942/canvas/4628269.json",
-                    initialView: { zoom: 1.2, x: 0.6, y: 0.4 },
-                    animation: { zoom: 1, x: 0.5, y: 0.5 },
-                    description: "The Women's Peace Petition with signature highlighted"
+                    canvasJson: "https://damsssl.llgc.org.uk/iiif/2.0/4642022/canvas/4642023.json",
+                    initialView: { zoom: 0.6, x: 0.5, y: 0.8 },
+                    canvasSequence: {
+                        secondCanvasJson: "https://damsssl.llgc.org.uk/iiif/2.0/4642022/canvas/4642367.json",
+                        secondInitialView: { zoom: 0.7, x: 0.5, y: 1.0 }, // Initial view for second canvas
+                        switchDelay: 6000, // Wait 4 seconds before switching canvas
+                        targetCrop: "2316,5034,1740,214", // Optional: zoom into area of second canvas
+                        cropDelay: 4000 // Wait 2s after loading second canvas before zooming
+                    },
+                   // annotations: {
+                   //     data: [
+                   //         {
+                   //             text: "Pte. John Emrys Ladd - Cardigan",
+                   //             target: "xywh=2316,5034,1740,214" // Same coordinates as targetCrop if used
+                   //         }
+                   //     ],
+                    //    showAfterFinalZoom: true,
+                   //     delay: 1000
+                   // },
+                    description: "Canvas sequence: first document → second document with zoom"
                 },
                 {
                     id: 3,
-                    canvasJson: "https://damsssl.llgc.org.uk/iiif/2.0/4627942/canvas/4628269.json",
-                    initialView: { zoom: 1, x: 0.5, y: 0.5 },
-                    animation: { zoom: 2.5, x: 0.4, y: 0.6, duration: 1000 },
-                    description: "Eleanor's portrait from our photographic collection"
+                    canvasJson: "https://damsssl.llgc.org.uk/iiif/2.0/4078677/canvas/4078803.json",
+                    initialView: { zoom: 0.6, x: 0.5, y: 0.8 },
+                    canvasSequence: {
+                        secondCanvasJson: "https://damsssl.llgc.org.uk/iiif/2.0/4078677/canvas/4078804.json",
+                        secondInitialView: { zoom: 0.7, x: 0.5, y: 1.0 }, // Initial view for second canvas
+                        switchDelay: 6000, // Wait 4 seconds before switching canvas
+                         targetCrop: "508,3490,2839,1071", // Optional: zoom into area of second canvas
+                        cropDelay: 4000 // Wait 2s after loading second canvas before zooming
+                    },
+                    description: "Canvas sequence: first document → second document with zoom"
                 },
                 {
                     id: 4,
-                    canvasJson: "https://damsssl.llgc.org.uk/iiif/2.0/4627942/canvas/4628015.json",
-                    initialView: { zoom: 1, x: 0.5, y: 0.5 },
-                    animation: { zoom: 2, x: 0.3, y: 0.7, duration: 2500 },
-                    description: "Eleanor's correspondence revealing her continued activism"
+                    iiifImageId: "https://damsssl.llgc.org.uk/iiif/2.0/image/3413408",
+                    initialView: { zoom: 1, x: 0.5, y: 0.5 }, // Full document view
+                    cropAnimation: {
+                        targetCrop: "670,957,1297,4124", // Focus on Jack Ladd using same format as annotations
+                        delay: 3000  // Wait 2s before zooming to target
+                    }, 
+                    description: "Testing image sequence: first image → second image with zoom"
                 },
                 {
                     id: 5,
-                    canvasJson: null, // No specific canvas for reveal
+                    canvasJson: "https://damsssl.llgc.org.uk/iiif/2.0/6137019/canvas/6137020.json",
+                    initialView: { zoom: 0.6, x: 0.5, y: 0.8 },
+                    animation: { zoom: 1.0, x: 0.5, y: 1.5, duration: 5000, delay: 10000 }, // Wait 2 seconds before starting animation},
+                    annotations: {
+                        data: [
+                            {
+                                text: "M G Rowlands @ Underhill Mold",
+                                target: "xywh=223,3069,2571,246"
+                            },
+                            {
+                                text: "M E Rowlands @ Underhill Mold", 
+                                target: "xywh=229,3242,2343,206"
+                            },
+                            {
+                                text: "E Vield @ \"Mason's Arms\" Mold",
+                                target: "xywh=191,3388,2512,192"
+                            },
+                            {
+                                text: "B Williams @ 108 High Street Mold",
+                                target: "xywh=122,3533,3064,252"
+                            },
+                            {
+                                text: "A Williams @ 106 High Street Mold",
+                                target: "xywh=160,3630,2764,252"
+                            }
+                        ],
+                        showType: "progressive",
+                        delay: 1200
+                    },
+                    description: "The Women's Peace Petition with signature highlighted"
+                },
+                {
+                    id: 6,
+                    //canvasJson: "https://damsssl.llgc.org.uk/iiif/2.0/4642022/canvas/4642743.json",
+                    iiifImageId: "https://damsssl.llgc.org.uk/iiif/2.0/image/4642743",
+                    initialView: { zoom: 1, x: 0.5, y: 0.5 },
+                    cropAnimation: {
+                        targetCrop: "2256,2105,1467,267", // Another area to test
+                        delay: 2000
+                    },
+                    animation: { zoom: 2.0, x: 0.5, y: 0.8, duration: 4000, delay: 4000 },
+                    description: "Walter"
+                },
+                {
+                    id: 7,
+                    iiifImageId: "https://damsssl.llgc.org.uk/iiif/2.0/image/3410160",
+                    initialView: { zoom: 0.6, x: 0.5, y: 0.5 },
+                    cropAnimation: {
+                        targetCrop: "2992,7840,2028,1927", // Another area to test
+                        delay: 2000
+                    },
+                    animation: { zoom: 2.0, x: 0.5, y: 0.8, duration: 4000, delay: 4000 },
+                    description: "Walter in the news"
+                },
+                {
+                    id: 8,
+                    canvasJson: "https://damsssl.llgc.org.uk/iiif/2.0/6089967/canvas/6089969.json",
+                    initialView: { zoom: 0.6, x: 0.5, y: 0.8 },
+                    animation: { zoom: 1.0, x: 0.5, y: 1.0, duration: 3000, delay: 5000 }, // Wait 2 seconds before starting animation},
+                    annotations: {
+                        data: [
+                            {
+                                text: "Hannah Mary Ladd  --  7 Church Street Cardigan",
+                                target: "xywh=219,1888,3068,247"
+                            }
+                        ],
+                        showType: "progressive",
+                        delay: 1200
+                    },
+                    description: "The Women's Peace Petition with signature highlighted"
+                },
+                {
+                    id: 9,
+                    canvasJson: "http://dams.llgc.org.uk/iiif/2.0/5795566/canvas/5795577.json",
+                    initialView: { zoom: 0.5, x: 0.5, y: 0.9 },
+                    description: "The IIIF reveal moment"
+                },
+                {
+                    id: 10,
+                    canvasJson: null,
                     specialEffect: "fade",
                     description: "The IIIF reveal moment"
                 }
@@ -283,8 +585,182 @@
 
         let viewer;
         let currentSection = 0;
+        let annotationTimeouts = []; // Track annotation timeouts for cleanup
 
-        // Initialize OpenSeadragon viewer
+        // Enhanced navigation
+        function navigateStep(direction) {
+            const steps = document.querySelectorAll('.step');
+            const newSection = currentSection + direction;
+            
+            if (newSection >= 0 && newSection < steps.length) {
+                currentSection = newSection;
+                
+                // Smooth scroll to section
+                const targetStep = steps[newSection];
+                targetStep.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Manually trigger section loading - this is the key fix!
+                if (storyData.sections[newSection]) {
+                    debugLog('Navigation: Loading section', newSection + 1);
+                    loadSection(storyData.sections[newSection]);
+                }
+                
+                // Update visual states
+                steps.forEach(step => step.classList.remove('active'));
+                targetStep.classList.add('active');
+                
+                updateNavigationState();
+            }
+        }
+
+        function updateNavigationState() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentSection === 0;
+            nextBtn.disabled = currentSection === 6;
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                navigateStep(-1);
+            } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                navigateStep(1);
+            }
+        });
+
+        // Parse IIIF annotation format and convert using OpenSeadragon's coordinate system
+        function parseIIIFAnnotation(annotation) {
+            const coordsMatch = annotation.target.match(/xywh=(\d+),(\d+),(\d+),(\d+)/);
+            
+            if (coordsMatch && viewer.world.getItemCount() > 0) {
+                const [, x, y, w, h] = coordsMatch.map(Number);
+                
+                // Use OpenSeadragon's proper coordinate conversion
+                const tiledImage = viewer.world.getItemAt(0);
+                const rect = tiledImage.imageToViewportRectangle(x, y, w, h);
+                
+                // Calculate center point for zoom functionality 
+                const centerPoint = new OpenSeadragon.Point(
+                    rect.x + rect.width / 2,
+                    rect.y + rect.height / 2
+                );
+                
+                debugLog('Annotation coordinates:', {
+                    original: [x, y, w, h],
+                    converted: rect,
+                    center: centerPoint
+                });
+                
+                return {
+                    text: annotation.text,
+                    rect: rect,
+                    centerPoint: centerPoint
+                };
+            }
+            return null;
+        }
+
+        // Create annotation overlay with alternating colors (expanded color palette)
+        function createAnnotationOverlay(annotation, index) {
+            const overlay = document.createElement('div');
+            const colorClass = `color-${(index % 6) + 1}`; // Cycle through 6 colors
+            
+            overlay.className = `annotation-overlay ${colorClass}`;
+            
+            // Basic styling - size will be set by onDraw callback
+            overlay.style.cssText = `
+                border-radius: 8px;
+                padding: 8px;
+                color: white;
+                font-weight: bold;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+                pointer-events: auto;
+                animation: fadeInScale 0.6s ease-out both;
+                word-wrap: break-word;
+                line-height: 1.2;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                box-sizing: border-box;
+                overflow: hidden;
+                min-width: 100px;
+                min-height: 25px;
+            `;
+            
+            overlay.textContent = annotation.text;
+            
+            // Add click handler for zoom-to-annotation
+            overlay.addEventListener('click', () => {
+                zoomToAnnotation(annotation);
+            });
+            
+            debugLog(`Created overlay ${index + 1} with class: ${colorClass}`);
+            
+            return overlay;
+        }
+
+        // Zoom to specific annotation
+        function zoomToAnnotation(annotation) {
+            debugLog('Zooming to annotation:', annotation.text);
+            
+            const bounds = new OpenSeadragon.Rect(
+                annotation.centerPoint.x - 0.15,
+                annotation.centerPoint.y - 0.1,
+                0.3,
+                0.2
+            );
+            
+            viewer.viewport.fitBounds(bounds, true);
+        }
+
+        // Show annotations progressively with memory crash protection
+        function showAnnotationsProgressively(annotations, delay = 800, retryCount = 0) {
+            // Clear any existing timeouts
+            annotationTimeouts.forEach(timeout => clearTimeout(timeout));
+            annotationTimeouts = [];
+            
+            // Wait for the image to be fully loaded before adding overlays
+            if (viewer.world.getItemCount() === 0) {
+                if (retryCount < 10) { // Maximum 10 retries (5 seconds)
+                    debugLog(`No image loaded yet, waiting... (attempt ${retryCount + 1}/10)`);
+                    setTimeout(() => showAnnotationsProgressively(annotations, delay, retryCount + 1), 500);
+                } else {
+                    debugLog('Failed to load image after 10 attempts, skipping annotations');
+                }
+                return;
+            }
+            
+            debugLog('Starting progressive annotation display with', annotations.data.length, 'annotations');
+            
+            annotations.data.forEach((annotation, index) => {
+                const timeout = setTimeout(() => {
+                    const parsedAnnotation = parseIIIFAnnotation(annotation);
+                    if (parsedAnnotation) {
+                        const overlayElement = createAnnotationOverlay(parsedAnnotation, index);
+                        
+                        viewer.addOverlay({
+                            element: overlayElement,
+                            location: parsedAnnotation.rect,
+                            placement: OpenSeadragon.Placement.CENTER
+                        });
+                        
+                        debugLog(`Annotation ${index + 1} shown:`, parsedAnnotation.text);
+                        
+                    } else {
+                        debugLog(`Failed to parse annotation ${index + 1}:`, annotation);
+                    }
+                }, delay * index);
+                
+                annotationTimeouts.push(timeout);
+            });
+        }
+
+        // Initialize OpenSeadragon viewer with enhanced settings
         function initViewer() {
             viewer = OpenSeadragon({
                 id: "viewer",
@@ -301,96 +777,534 @@
                     pinchRotate: false
                 },
                 zoomPerScroll: 1,
-                animationTime: 1.5,
-                springStiffness: 15.0
+                animationTime: 2.5, // Slower, smoother animations
+                springStiffness: 8.0, // Less bouncy, more fluid
+                smoothTileEdgesMinZoom: 1.0,
+                iOSDevice: false, // Disable iOS-specific behavior that can cause jumps
+                constrainDuringPan: true,
+                visibilityRatio: 0.5
             });
 
             // Load first section
             loadSection(storyData.sections[0]);
         }
 
-        // Load a story section using canvas JSON approach
+        // Load a story section with support for multiple content types
         function loadSection(section) {
-            if (!section.canvasJson && section.specialEffect === "fade") {
+            debugLog('Loading section:', section.id, section.description);
+            
+            if (!section.canvasJson && !section.regularImage && !section.codeSnippet && !section.iiifImageId && section.specialEffect === "fade") {
                 document.getElementById('fadeOverlay').classList.add('active');
                 return;
             }
 
             document.getElementById('fadeOverlay').classList.remove('active');
 
+            // Clear existing handlers and overlays for ALL content types
+            if (viewer && viewer.removeAllHandlers) {
+            viewer.removeAllHandlers('open');
+            viewer.clearOverlays();
+            }
+            
+            // Clear any pending annotation timeouts
+            annotationTimeouts.forEach(timeout => clearTimeout(timeout));
+            annotationTimeouts = [];
+
+            // Handle IIIF Image API (direct image access)
+            if (section.iiifImageId) {
+                loadIIIFImage(section);
+                return;
+            }
+
+            // Handle code snippets - destroy OSD viewer first
+            if (section.codeSnippet) {
+                destroyViewer();
+                displayCodeSnippet(section.codeSnippet);
+                return;
+            }
+
+            // Handle regular images - destroy OSD viewer first
+            if (section.regularImage) {
+                destroyViewer();
+                displayRegularImage(section.regularImage, section.imagefit || "contain");
+                return;
+            }
+
+            // Handle IIIF canvas (existing functionality)
+            if (section.canvasJson) {
+                loadIIIFCanvas(section);
+                return;
+            }
+        }
+
+        // Destroy OpenSeadragon viewer completely
+        function destroyViewer() {
+            if (viewer) {
+                debugLog('Destroying OpenSeadragon viewer');
+                viewer.destroy();
+                viewer = null;
+            }
+            
+            // Clear the viewer container completely
+            const viewerElement = document.getElementById('viewer');
+            viewerElement.innerHTML = '';
+        }
+
+        // Reinitialize OpenSeadragon viewer
+        function reinitializeViewer() {
+            destroyViewer();
+            
+            debugLog('Reinitializing OpenSeadragon viewer');
+            viewer = OpenSeadragon({
+                id: "viewer",
+                prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
+                showNavigationControl: false,
+                showZoomControl: false,
+                showHomeControl: false,
+                showFullPageControl: false,
+                gestureSettingsMouse: {
+                    clickToZoom: false,
+                    dblClickToZoom: false,
+                    pinchToZoom: false,
+                    flickEnabled: false,
+                    pinchRotate: false
+                },
+                zoomPerScroll: 1,
+                animationTime: 2.5,
+                springStiffness: 8.0,
+                smoothTileEdgesMinZoom: 1.0,
+                iOSDevice: false,
+                constrainDuringPan: true,
+                visibilityRatio: 0.5
+            });
+            
+            return viewer;
+        }
+
+        // Display code snippet in viewer panel
+        function displayCodeSnippet(codeConfig) {
+            const viewerElement = document.getElementById('viewer');
+            
+            // Create code display container
+            const codeContainer = document.createElement('div');
+            codeContainer.style.cssText = `
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f172a 100%);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem;
+                box-sizing: border-box;
+                overflow: auto;
+            `;
+
+            // Add title if provided
+            if (codeConfig.title) {
+                const title = document.createElement('h2');
+                title.textContent = codeConfig.title;
+                title.style.cssText = `
+                    color: #e2e8f0;
+                    font-family: 'Georgia', serif;
+                    font-size: 2rem;
+                    margin-bottom: 2rem;
+                    text-align: center;
+                `;
+                codeContainer.appendChild(title);
+            }
+
+            // Create code block
+            const pre = document.createElement('pre');
+            pre.style.cssText = `
+                background: rgba(15, 23, 42, 0.8);
+                border: 1px solid #334155;
+                border-radius: 12px;
+                padding: 2rem;
+                margin: 0;
+                max-width: 90%;
+                max-height: 70%;
+                overflow: auto;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                backdrop-filter: blur(10px);
+            `;
+
+            const code = document.createElement('code');
+            code.textContent = codeConfig.code;
+            code.style.cssText = `
+                color: #e2e8f0;
+                font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+                font-size: 14px;
+                line-height: 1.6;
+                white-space: pre-wrap;
+            `;
+
+            // Add syntax highlighting based on language
+            if (codeConfig.language === 'json') {
+                applySyntaxHighlighting(code, 'json');
+            }
+
+            pre.appendChild(code);
+            codeContainer.appendChild(pre);
+
+            // Replace viewer content
+            viewerElement.innerHTML = '';
+            viewerElement.appendChild(codeContainer);
+
+            debugLog('Code snippet displayed:', codeConfig.title || 'Untitled');
+        }
+
+        // Simple JSON syntax highlighting
+        function applySyntaxHighlighting(codeElement, language) {
+            if (language === 'json') {
+                let html = codeElement.textContent
+                    .replace(/("[\w\-\.:/@]+")(\s*:)/g, '<span style="color: #7dd3fc;">$1</span>$2') // Keys (blue)
+                    .replace(/:\s*(".*?")/g, ': <span style="color: #86efac;">$1</span>') // String values (green)
+                    .replace(/:\s*(\d+)/g, ': <span style="color: #fbbf24;">$1</span>') // Number values (yellow)
+                    .replace(/:\s*(true|false|null)/g, ': <span style="color: #f87171;">$1</span>') // Boolean/null (red)
+                    .replace(/([{}[\],])/g, '<span style="color: #a78bfa;">$1</span>'); // Punctuation (purple)
+                
+                codeElement.innerHTML = html;
+            }
+        }
+
+        // Display regular image in viewer panel
+        function displayRegularImage(imageUrl, fit) {
+            const viewerElement = document.getElementById('viewer');
+            
+            const imageContainer = document.createElement('div');
+            imageContainer.style.cssText = `
+                width: 100%;
+                height: 100%;
+                background: #000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1rem;
+                box-sizing: border-box;
+            `;
+
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.style.cssText = `
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: ${fit};
+                border-radius: 8px;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            `;
+
+            img.onload = () => {
+                debugLog('Regular image loaded:', imageUrl);
+            };
+
+            img.onerror = () => {
+                debugLog('Error loading image:', imageUrl);
+                img.alt = 'Image failed to load';
+                img.style.color = 'white';
+                img.style.background = '#374151';
+                img.style.padding = '2rem';
+                img.style.borderRadius = '8px';
+            };
+
+            imageContainer.appendChild(img);
+            viewerElement.innerHTML = '';
+            viewerElement.appendChild(imageContainer);
+
+            debugLog('Regular image displayed:', imageUrl);
+        }
+
+        // Load IIIF Image API (direct image access with crop animations)
+        function loadIIIFImage(section) {
+            // Always reinitialize viewer for IIIF content after non-IIIF content
+            const viewerElement = document.getElementById('viewer');
+            if (!viewerElement.querySelector('.openseadragon-container') || !viewer) {
+                debugLog('Reinitializing OpenSeadragon for IIIF Image API');
+                reinitializeViewer();
+                
+                setTimeout(() => {
+                    loadIIIFImage(section);
+                }, 200);
+                return;
+            }
+
+            const imageInfoUrl = section.iiifImageId + '/info.json';
+            
+            debugLog('Loading IIIF Image:', imageInfoUrl);
+
+            // Set up handler for simple crop animation or image sequence
+            viewer.addHandler("open", function() {
+                setTimeout(() => {
+                    const view = section.initialView;
+                    if (view && viewer.viewport) {
+                        // Set initial view (full document)
+                        viewer.viewport.zoomTo(view.zoom, new OpenSeadragon.Point(view.x, view.y), false);
+                        
+                        debugLog('IIIF Image initial view set:', view);
+
+                        // Handle image sequence (switch to different image after delay)
+                        if (section.imageSequence) {
+                            performImageSequence(section);
+                        }
+                        // Handle simple crop animation like regular IIIF sections
+                        else if (section.cropAnimation) {
+                            performSimpleCropAnimation(section);
+                        }
+                    }
+                }, 100);
+            });
+
+            // Open the IIIF image
+            viewer.open(imageInfoUrl);
+        }
+
+        // Perform image sequence: show first image, then switch to second image with zoom
+        function performImageSequence(section) {
+            const sequence = section.imageSequence;
+            
+            debugLog('Starting image sequence:', {
+                firstImage: section.iiifImageId,
+                secondImage: sequence.secondImageId,
+                switchDelay: sequence.switchDelay,
+                targetCrop: sequence.targetCrop
+            });
+
+            // Wait for specified delay, then switch to second image
+            setTimeout(() => {
+                debugLog('Switching to second image in sequence');
+                
+                const secondImageUrl = sequence.secondImageId + '/info.json';
+                
+                // Set up handler for the second image
+                viewer.addHandler("open", function secondImageHandler() {
+                    // Remove this handler so it doesn't interfere with future loads
+                    viewer.removeHandler("open", secondImageHandler);
+                    
+                    setTimeout(() => {
+                        debugLog('Second image loaded, setting up zoom');
+                        
+                        // Set initial view for second image
+                        const view = section.initialView;
+                        viewer.viewport.zoomTo(view.zoom, new OpenSeadragon.Point(view.x, view.y), false);
+                        
+                        // If there's a target crop, zoom to it after a delay
+                        if (sequence.targetCrop) {
+                            setTimeout(() => {
+                                // Use the same coordinate parsing as annotations
+                                const targetAnnotation = {
+                                    target: `xywh=${sequence.targetCrop}`
+                                };
+
+                                const parsedCrop = parseIIIFAnnotation(targetAnnotation);
+                                
+                                if (parsedCrop) {
+                                    debugLog('Zooming to target crop in second image:', parsedCrop);
+                                    viewer.viewport.fitBounds(parsedCrop.rect, false); // Smooth animation
+                                    
+                                    // Show annotations if any
+                                    if (section.annotations && section.annotations.showAfterFinalZoom) {
+                                        setTimeout(() => {
+                                            showAnnotationsProgressively(
+                                                section.annotations,
+                                                section.annotations.delay || 1000
+                                            );
+                                        }, (viewer.animationTime * 1000) + (section.annotations.delay || 1000));
+                                    }
+                                } else {
+                                    debugLog('Failed to parse target crop:', sequence.targetCrop);
+                                }
+                            }, sequence.cropDelay || 1000);
+                        }
+                    }, 100);
+                });
+                
+                // Load the second image
+                viewer.open(secondImageUrl);
+                
+            }, sequence.switchDelay || 3000);
+        }
+
+        // Perform simple crop animation using the same coordinate conversion as annotations
+        function performSimpleCropAnimation(section) {
+            const cropAnim = section.cropAnimation;
+            
+            // Wait for image to be fully loaded
+            setTimeout(() => {
+                if (viewer.world.getItemCount() === 0) {
+                    debugLog('No image loaded for crop animation');
+                    return;
+                }
+
+                // Use the same coordinate parsing as annotations - this works!
+                const targetAnnotation = {
+                    target: `xywh=${cropAnim.targetCrop}`
+                };
+
+                const parsedCrop = parseIIIFAnnotation(targetAnnotation);
+                
+                if (parsedCrop) {
+                    debugLog('Parsed crop for animation:', {
+                        targetCrop: cropAnim.targetCrop,
+                        parsedRect: parsedCrop.rect,
+                        centerPoint: parsedCrop.centerPoint
+                    });
+
+                    // Use OpenSeadragon's fitBounds with smooth animation - like regular IIIF sections
+                    setTimeout(() => {
+                        debugLog('Animating to crop area using smooth fitBounds');
+                        viewer.viewport.fitBounds(parsedCrop.rect, false); // false for smooth animation
+                        
+                        // Show annotations after animation completes (use animation duration + buffer)
+                        if (section.annotations && section.annotations.showAfterFinalZoom) {
+                            setTimeout(() => {
+                                showAnnotationsProgressively(
+                                    section.annotations,
+                                    section.annotations.delay || 1000
+                                );
+                            }, (viewer.animationTime * 1000) + (section.annotations.delay || 1000));
+                        }
+                    }, cropAnim.delay || 2000);
+                } else {
+                    debugLog('Failed to parse crop coordinates:', cropAnim.targetCrop);
+                }
+            }, 1000);
+        }
+
+        // Perform simple crop animation using the same coordinate conversion as annotations
+        function performSimpleCropAnimation(section) {
+            const cropAnim = section.cropAnimation;
+            
+            // Wait for image to be fully loaded
+            setTimeout(() => {
+                if (viewer.world.getItemCount() === 0) {
+                    debugLog('No image loaded for crop animation');
+                    return;
+                }
+
+                // Use the same coordinate parsing as annotations - this works!
+                const targetAnnotation = {
+                    target: `xywh=${cropAnim.targetCrop}`
+                };
+
+                const parsedCrop = parseIIIFAnnotation(targetAnnotation);
+                
+                if (parsedCrop) {
+                    debugLog('Parsed crop for animation:', {
+                        targetCrop: cropAnim.targetCrop,
+                        parsedRect: parsedCrop.rect,
+                        centerPoint: parsedCrop.centerPoint
+                    });
+
+                    // Use OpenSeadragon's fitBounds with smooth animation - like regular IIIF sections
+                    setTimeout(() => {
+                        debugLog('Animating to crop area using smooth fitBounds');
+                        viewer.viewport.fitBounds(parsedCrop.rect, false); // false for smooth animation
+                        
+                        // Show annotations after animation completes (use animation duration + buffer)
+                        if (section.annotations && section.annotations.showAfterFinalZoom) {
+                            setTimeout(() => {
+                                showAnnotationsProgressively(
+                                    section.annotations,
+                                    section.annotations.delay || 1000
+                                );
+                            }, (viewer.animationTime * 1000) + (section.annotations.delay || 1000));
+                        }
+                    }, cropAnim.delay || 2000);
+                } else {
+                    debugLog('Failed to parse crop coordinates:', cropAnim.targetCrop);
+                }
+            }, 1000);
+        }
+
+        function loadIIIFCanvas(section) {
+            // Always reinitialize viewer for IIIF content after non-IIIF content
+            const viewerElement = document.getElementById('viewer');
+            if (!viewerElement.querySelector('.openseadragon-container') || !viewer) {
+                debugLog('Reinitializing OpenSeadragon after non-IIIF content');
+                reinitializeViewer();
+                
+                // Wait for viewer to initialize before loading content
+                setTimeout(() => {
+                    loadIIIFCanvas(section);
+                }, 200);
+                return;
+            }
+
+            // Check if this is a canvas sequence or regular canvas
+            if (section.canvasSequence) {
+                performCanvasSequence(section);
+            } else {
+                loadSingleCanvas(section);
+            }
+        }
+
+        // Load a single canvas (existing functionality)
+        function loadSingleCanvas(section) {
             // Fetch canvas JSON directly
             fetch(section.canvasJson)
                 .then(res => res.json())
                 .then(canvas => {
                     debugLog('Canvas loaded:', canvas);
                     
-                    // Extract image service from canvas
-                    let imageService;
-                    let tileSource;
-
-                    if (canvas.images && canvas.images[0] && canvas.images[0].resource) {
-                        // IIIF 2.x canvas format
-                        const resource = canvas.images[0].resource;
-                        
-                        if (resource.service) {
-                            imageService = resource.service;
-                        } else if (resource['@id']) {
-                            // Sometimes the image itself contains the service URL
-                            const imageId = resource['@id'];
-                            imageService = { '@id': imageId.replace(/\/full\/.*$/, '') };
-                        }
-                    }
-
-                    if (imageService && imageService['@id']) {
-                        // Create proper IIIF tile source
-                        tileSource = {
-                            "@context": "http://iiif.io/api/image/2/context.json",
-                            "@id": imageService["@id"],
-                            "width": canvas.width,
-                            "height": canvas.height,
-                            "profile": imageService.profile || ["http://iiif.io/api/image/2/level1.json"],
-                            "protocol": "http://iiif.io/api/image"
-                        };
-                    } else {
-                        // Fallback: construct info.json URL from canvas JSON URL
-                        const baseUrl = section.canvasJson.replace(/\/canvas\/.*\.json$/, '');
-                        tileSource = baseUrl + '/info.json';
-                    }
-
+                    const tileSource = extractTileSourceFromCanvas(canvas, section.canvasJson);
                     debugLog('Tile source:', tileSource);
 
-                    // Clear existing handlers
-                    viewer.removeAllHandlers('open');
-                    viewer.clearOverlays();
-
-                    // Set up new handler for this section
+                    // Set up new handler for this section with truly smooth transitions
                     viewer.addHandler("open", function() {
                         setTimeout(() => {
-                            // Set initial view
                             const view = section.initialView;
                             if (view && viewer.viewport) {
-                                viewer.viewport.fitBounds(
-                                    new OpenSeadragon.Rect(
-                                        view.x - 0.5/view.zoom, 
-                                        view.y - 0.5/view.zoom, 
-                                        1/view.zoom, 
-                                        1/view.zoom
-                                    ),
-                                    false
-                                );
+                                // Set initial view smoothly on first load, not immediately
+                                viewer.viewport.zoomTo(view.zoom, new OpenSeadragon.Point(view.x, view.y), false);
+                                
+                                debugLog('Initial view set smoothly:', {
+                                    zoom: view.zoom,
+                                    center: { x: view.x, y: view.y }
+                                });
 
-                                // Apply animation if specified
+                                // Apply smooth animation if specified - let OpenSeadragon do the work
                                 if (section.animation) {
+                                    const animationDelay = section.animation.delay || 500;
                                     setTimeout(() => {
                                         const anim = section.animation;
-                                        const bounds = new OpenSeadragon.Rect(
-                                            anim.x - 0.5/anim.zoom,
-                                            anim.y - 0.5/anim.zoom,
-                                            1/anim.zoom,
-                                            1/anim.zoom
+                                        
+                                        // Calculate meaningful changes
+                                        const zoomChange = Math.abs(anim.zoom - view.zoom);
+                                        const positionChange = Math.abs(anim.x - view.x) + Math.abs(anim.y - view.y);
+                                        
+                                        if (zoomChange > 0.01 || positionChange > 0.01) {
+                                        const targetCenter = new OpenSeadragon.Point(anim.x, anim.y);
+                                        
+                                            // Let OpenSeadragon handle the smooth transition naturally
+                                            // Use false for smooth animation, not true for immediate
+                                            viewer.viewport.zoomTo(anim.zoom, targetCenter, false);
+                                            
+                                            debugLog('Natural smooth transition to:', {
+                                                from: { zoom: view.zoom, x: view.x, y: view.y },
+                                                to: { zoom: anim.zoom, x: anim.x, y: anim.y },
+                                                zoomChange: zoomChange,
+                                                positionChange: positionChange
+                                            });
+                                        }
+                                        
+                                        // Show annotations after animation completes
+                                        if (section.annotations) {
+                                            setTimeout(() => {
+                                                showAnnotationsProgressively(
+                                                    section.annotations, 
+                                                    section.annotations.delay || 800
+                                                );
+                                            }, anim.duration || 2000);
+                                        }
+                                    }, animationDelay); // Use configurable delay
+                                } else if (section.annotations) {
+                                    // Show annotations immediately if no animation
+                                    setTimeout(() => {
+                                        showAnnotationsProgressively(
+                                            section.annotations, 
+                                            section.annotations.delay || 800
                                         );
-                                        viewer.viewport.fitBounds(bounds, true);
-                                    }, 500);
+                                    }, 1000);
                                 }
                             }
                         }, 100);
@@ -409,6 +1323,147 @@
                     debugLog('Trying fallback URL:', infoUrl);
                     viewer.open(infoUrl);
                 });
+        }
+
+        // Perform canvas sequence: show first canvas, then switch to second canvas
+        function performCanvasSequence(section) {
+            const sequence = section.canvasSequence;
+            
+            debugLog('Starting canvas sequence:', {
+                firstCanvas: section.canvasJson,
+                secondCanvas: sequence.secondCanvasJson,
+                switchDelay: sequence.switchDelay
+            });
+
+            // Load first canvas
+            fetch(section.canvasJson)
+                .then(res => res.json())
+                .then(firstCanvas => {
+                    debugLog('First canvas loaded:', firstCanvas);
+                    
+                    const firstTileSource = extractTileSourceFromCanvas(firstCanvas, section.canvasJson);
+                    
+                    // Set up handler for first canvas
+                    viewer.addHandler("open", function firstCanvasHandler() {
+                        // Remove this handler so it doesn't interfere
+                        viewer.removeHandler("open", firstCanvasHandler);
+                        
+                        setTimeout(() => {
+                            const view = section.initialView;
+                            if (view && viewer.viewport) {
+                                viewer.viewport.zoomTo(view.zoom, new OpenSeadragon.Point(view.x, view.y), false);
+                                debugLog('First canvas initial view set:', view);
+                                
+                                // Wait for specified delay, then switch to second canvas
+                                setTimeout(() => {
+                                    debugLog('Switching to second canvas');
+                                    
+                                    // Load second canvas
+                                    fetch(sequence.secondCanvasJson)
+                                        .then(res => res.json())
+                                        .then(secondCanvas => {
+                                            debugLog('Second canvas loaded:', secondCanvas);
+                                            
+                                            const secondTileSource = extractTileSourceFromCanvas(secondCanvas, sequence.secondCanvasJson);
+                                            
+                                            // Set up handler for second canvas
+                                            viewer.addHandler("open", function secondCanvasHandler() {
+                                                viewer.removeHandler("open", secondCanvasHandler);
+                                                
+                                                setTimeout(() => {
+                                                    const secondView = sequence.secondInitialView;
+                                                    if (secondView && viewer.viewport) {
+                                                        viewer.viewport.zoomTo(secondView.zoom, new OpenSeadragon.Point(secondView.x, secondView.y), false);
+                                                        debugLog('Second canvas initial view set:', secondView);
+                                                        
+                                                        // Optional: zoom to target crop after delay
+                                                        if (sequence.targetCrop) {
+                                                            setTimeout(() => {
+                                                                const targetAnnotation = { target: `xywh=${sequence.targetCrop}` };
+                                                                const parsedCrop = parseIIIFAnnotation(targetAnnotation);
+                                                                
+                                                                if (parsedCrop) {
+                                                                    debugLog('Zooming to target crop in second canvas:', parsedCrop);
+                                                                    viewer.viewport.fitBounds(parsedCrop.rect, false);
+                                                                    
+                                                                    // Show annotations after zoom
+                                                                    if (section.annotations && section.annotations.showAfterFinalZoom) {
+                                                                        setTimeout(() => {
+                                                                            showAnnotationsProgressively(
+                                                                                section.annotations,
+                                                                                section.annotations.delay || 1000
+                                                                            );
+                                                                        }, (viewer.animationTime * 1000) + (section.annotations.delay || 1000));
+                                                                    }
+                                                                }
+                                                            }, sequence.cropDelay || 2000);
+                                                        } else if (section.annotations) {
+                                                            // Show annotations without crop zoom
+                                                            setTimeout(() => {
+                                                                showAnnotationsProgressively(
+                                                                    section.annotations,
+                                                                    section.annotations.delay || 1000
+                                                                );
+                                                            }, 2000);
+                                                        }
+                                                    }
+                                                }, 100);
+                                            });
+                                            
+                                            // Load the second canvas
+                                            viewer.open(secondTileSource);
+                                        })
+                                        .catch(error => {
+                                            debugLog('Error loading second canvas:', error);
+                                        });
+                                }, sequence.switchDelay || 4000);
+                            }
+                        }, 100);
+                    });
+                    
+                    // Load the first canvas
+                    viewer.open(firstTileSource);
+                })
+                .catch(error => {
+                    debugLog('Error loading first canvas:', error);
+            });
+        }
+
+        // Extract tile source from canvas JSON (helper function)
+        function extractTileSourceFromCanvas(canvas, canvasJsonUrl) {
+            let imageService;
+            let tileSource;
+
+            if (canvas.images && canvas.images[0] && canvas.images[0].resource) {
+                // IIIF 2.x canvas format
+                const resource = canvas.images[0].resource;
+                
+                if (resource.service) {
+                    imageService = resource.service;
+                } else if (resource['@id']) {
+                    // Sometimes the image itself contains the service URL
+                    const imageId = resource['@id'];
+                    imageService = { '@id': imageId.replace(/\/full\/.*$/, '') };
+                }
+            }
+
+            if (imageService && imageService['@id']) {
+                // Create proper IIIF tile source
+                tileSource = {
+                    "@context": "http://iiif.io/api/image/2/context.json",
+                    "@id": imageService["@id"],
+                    "width": canvas.width,
+                    "height": canvas.height,
+                    "profile": imageService.profile || ["http://iiif.io/api/image/2/level1.json"],
+                    "protocol": "http://iiif.io/api/image"
+                };
+            } else {
+                // Fallback: construct info.json URL from canvas JSON URL
+                const baseUrl = canvasJsonUrl.replace(/\/canvas\/.*\.json$/, '');
+                tileSource = baseUrl + '/info.json';
+            }
+
+            return tileSource;
         }
 
         // Scroll detection using Intersection Observer
@@ -430,10 +1485,11 @@
                         
                         // Get step number and load corresponding section
                         const stepNum = parseInt(entry.target.dataset.step);
-                        if (stepNum !== currentSection && stepNum <= storyData.sections.length) {
+                        if (stepNum !== currentSection + 1 && stepNum <= storyData.sections.length) {
                             debugLog('Loading section:', stepNum);
-                            currentSection = stepNum;
+                            currentSection = stepNum - 1;
                             loadSection(storyData.sections[stepNum - 1]);
+                            updateNavigationState();
                         }
                     }
                 });
@@ -508,6 +1564,7 @@
             
             initViewer();
             setupScrollTriggers();
+            updateNavigationState();
         });
     </script>
 </body>
